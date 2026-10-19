@@ -12,3 +12,11 @@ This folder contains source metadata and original cover artwork. Nothing here pu
 The generated upload folder contains only `workshop.txt`, `preview.png`, and `Contents/mods/ModSettingsFolders` with mod files and the MIT license. No Git history, EXE, ZIP, test harness, user configuration, logs or development tools are included. The authoring SVG and generator stay in the repository and are not uploaded.
 
 The native validator checks package structure; it does not establish live gameplay compatibility, successful publication, or acceptance of Steam's legal agreement.
+
+## Updating the existing local authoring folder
+
+Run `./Sync-Workshop.ps1` after preparing and checking the current version. It defaults to the current user's `Zomboid/Workshop/ModSettingsFolders`; `-WorkshopDirectory` supports a custom user directory. It requires an existing mod with the correct ID and updates only `Contents/mods/ModSettingsFolders`.
+
+The existing `workshop.txt`, Workshop ID, title, description, visibility, cover and other root files remain byte-identical. Other mods in the same Workshop item are retained. The old mod tree is moved to `Zomboid/ModSettingsFoldersBackups/Workshop/<transaction>/previous`, outside the upload tree. A failed swap is rolled back; identical files cause a verification-only no-op. Junctions, foreign identities and backup paths within the Workshop tree are rejected. `tests/Test-WorkshopSync.ps1` exercises these cases and an injected post-swap failure under ignored build fixtures.
+
+Delivery policy is recorded in `AGENTS.md`: push after three new local commits or a major feature release, synchronizing the local authoring folder at the same time. Uploading to Steam remains a separate manual action by the user.
