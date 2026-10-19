@@ -17,6 +17,8 @@ if (!$PSBoundParameters.ContainsKey('WorkshopId') -and (Test-Path -LiteralPath $
 }
 [UInt64]$parsedId = 0
 if ($WorkshopId -and ($WorkshopId -notmatch '^[1-9][0-9]{0,19}$' -or ![UInt64]::TryParse($WorkshopId,[ref]$parsedId))) { throw 'Invalid Workshop ID' }
+# Release notes stay beside distributions, outside the Workshop upload tree.
+& (Join-Path $root 'Copy-ReleaseNotes.ps1')
 $stage = Join-Path $root "build/workshop/.stage-$([Guid]::NewGuid().ToString('N'))"
 New-Item -ItemType Directory -Path (Join-Path $stage 'Contents/mods') -Force | Out-Null
 # Walk without following links; copy files individually from the explicit runtime root.

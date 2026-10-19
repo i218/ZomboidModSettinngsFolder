@@ -4,6 +4,7 @@ $root = $PSScriptRoot
 $info = Get-Content -LiteralPath (Join-Path $root 'Contents/mods/ModSettingsFolders/42/mod.info') -Raw
 $version = [regex]::Match($info, '(?m)^modversion=([0-9]+\.[0-9]+\.[0-9]+)\s*$').Groups[1].Value
 if (!$version) { throw 'Missing semantic version' }
+& (Join-Path $root 'Copy-ReleaseNotes.ps1')
 $out = Join-Path $root "build/distributions/$version"
 $payload = Join-Path $out "ModSettingsFolders-$version.zip"
 if (!(Test-Path -LiteralPath $payload)) { & (Join-Path $root 'Build.ps1') }

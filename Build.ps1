@@ -4,6 +4,7 @@ $source = Join-Path $root 'Contents/mods/ModSettingsFolders'
 $info = Get-Content -LiteralPath (Join-Path $source '42/mod.info') -Raw
 $version = [regex]::Match($info, '(?m)^modversion=([0-9]+\.[0-9]+\.[0-9]+)\s*$').Groups[1].Value
 if (!$version) { throw 'Missing semantic version in mod.info' }
+& (Join-Path $root 'Copy-ReleaseNotes.ps1')
 $out = Join-Path $root "build/distributions/$version"
 New-Item -ItemType Directory -Path $out -Force | Out-Null
 $zipPath = Join-Path $out "ModSettingsFolders-$version.zip"

@@ -3,13 +3,17 @@ $root = Split-Path -Parent $PSScriptRoot
 $fixture = Join-Path $root "build/workshop-lifecycle/$([Guid]::NewGuid().ToString('N'))"
 New-Item -ItemType Directory -Path $fixture,(Join-Path $fixture 'tests'),(Join-Path $fixture 'workshop') -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $root 'Contents') -Destination (Join-Path $fixture 'Contents') -Recurse
-foreach ($name in @('Build-Workshop.ps1','LICENSE')) { Copy-Item -LiteralPath (Join-Path $root $name) -Destination (Join-Path $fixture $name) }
+foreach ($name in @('Build-Workshop.ps1','Copy-ReleaseNotes.ps1','LICENSE')) { Copy-Item -LiteralPath (Join-Path $root $name) -Destination (Join-Path $fixture $name) }
 Copy-Item -LiteralPath (Join-Path $root 'tests/Verify-Workshop.ps1') -Destination (Join-Path $fixture 'tests/Verify-Workshop.ps1')
 foreach ($name in @('workshop.txt','preview.png')) { Copy-Item -LiteralPath (Join-Path $root "workshop/$name") -Destination (Join-Path $fixture "workshop/$name") }
+Copy-Item -LiteralPath (Join-Path $root 'release-notes') -Destination (Join-Path $fixture 'release-notes') -Recurse
 $builder = Join-Path $fixture 'Build-Workshop.ps1'
 & $builder | Out-Null
 $version = [regex]::Match((Get-Content -LiteralPath (Join-Path $fixture 'Contents/mods/ModSettingsFolders/42/mod.info') -Raw),'(?m)^modversion=([0-9]+\.[0-9]+\.[0-9]+)\s*$').Groups[1].Value
 $package = Join-Path $fixture "build/workshop/$version/ModSettingsFolders"
+$notes = Join-Path $fixture "build/distributions/$version/CHANGELOG-Steam.txt"
+if (!(Test-Path -LiteralPath $notes) -or (Get-FileHash -LiteralPath $notes).Hash -ne (Get-FileHash -LiteralPath (Join-Path $fixture "release-notes/$version.txt")).Hash) { throw 'Release changelog missing or altered' }
+if (Get-ChildItem -LiteralPath $package -Recurse -File | Where-Object { $_.Name -match 'changelog' }) { throw 'Changelog leaked into Workshop upload' }
 $metadata = Join-Path $package 'workshop.txt'
 $before = (Get-FileHash -LiteralPath $metadata).Hash
 $rejected = $false
