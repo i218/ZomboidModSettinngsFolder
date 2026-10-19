@@ -7,6 +7,8 @@ from pathlib import Path
 import json
 import re
 import subprocess
+import struct
+import zlib
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,6 +42,34 @@ findings = set()
 
 
 def scan(label, raw):
+    if label.endswith("/workshop/preview.png"):
+        # This one project asset is a rasterized vector cover. Reject metadata chunks.
+        valid = raw.startswith(b"\x89PNG\r\n\x1a\n")
+        offset = 8
+        chunks = []
+        while valid and offset < len(raw):
+            if offset + 12 > len(raw):
+                valid = False
+                break
+            size = struct.unpack(">I", raw[offset:offset+4])[0]
+            kind = raw[offset+4:offset+8]
+            end = offset + 12 + size
+            if end > len(raw) or kind not in (b"IHDR", b"IDAT", b"IEND"):
+                valid = False
+                break
+            data = raw[offset+8:offset+8+size]
+            crc = struct.unpack(">I", raw[offset+8+size:end])[0]
+            if zlib.crc32(kind + data) & 0xffffffff != crc:
+                valid = False
+                break
+            if kind == b"IHDR" and (len(data) != 13 or struct.unpack(">II", data[:8]) != (512,512)):
+                valid = False
+                break
+            chunks.append(kind)
+            offset = end
+        if not valid or offset != len(raw) or len(raw) > 1024000 or not chunks or chunks[0] != b"IHDR" or chunks[-1] != b"IEND":
+            findings.add((label, 0, "invalid-cover-or-image-metadata"))
+        return
     try:
         text = raw.decode("utf-8-sig")
     except UnicodeDecodeError:

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<rect x="0" y="0" width="512" height="512" rx="0" fill="#131c1d"/>
+<rect x="26" y="28" width="4" height="104" rx="2" fill="#e9b85e"/>
+<text x="46" y="30" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="31" font-weight="700" fill="#dce7e1">MOD SETTINGS</text>
+<text x="42" y="68" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="64" font-weight="700" fill="#ffffff">FOLDERS</text>
+<text x="46" y="145" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="19" font-weight="400" fill="#a5b7b0">A place for every setting.</text>
+<rect x="63" y="216" width="4" height="155" rx="2" fill="#51645d"/>
+<rect x="65" y="368" width="69" height="4" rx="2" fill="#51645d"/>
+<rect x="65" y="269" width="69" height="4" rx="2" fill="#51645d"/>
+<polygon points="115,226 115,210 168,210 181,226 358,226 358,289 115,289" fill="#b48032"/>
+<rect x="115" y="233" width="253" height="66" rx="8" fill="#ebbe68"/>
+<rect x="138" y="253" width="15" height="15" rx="3" fill="#3c4638"/>
+<rect x="166" y="253" width="158" height="6" rx="3" fill="#725c32"/>
+<rect x="166" y="267" width="118" height="6" rx="3" fill="#967b45"/>
+<polygon points="115,326 115,310 168,310 181,326 358,326 358,389 115,389" fill="#50766b"/>
+<rect x="115" y="333" width="253" height="66" rx="8" fill="#8db9a6"/>
+<rect x="138" y="353" width="15" height="15" rx="3" fill="#28413b"/>
+<rect x="166" y="353" width="158" height="6" rx="3" fill="#486c60"/>
+<rect x="166" y="367" width="118" height="6" rx="3" fill="#608778"/>
+<rect x="337" y="274" width="116" height="81" rx="10" fill="#22322f"/>
+<rect x="356" y="294" width="16" height="16" rx="3" fill="#e9b85e"/>
+<polygon points="359,301 362,305 369,297 372,300 362,310 356,304" fill="#22322f"/>
+<rect x="385" y="297" width="47" height="5" rx="2" fill="#b7cbc0"/>
+<rect x="356" y="321" width="16" height="16" rx="3" fill="#8db9a6"/>
+<rect x="385" y="324" width="47" height="5" rx="2" fill="#b7cbc0"/>
+<rect x="40" y="440" width="137" height="38" rx="8" fill="#263a33"/>
+<text x="57" y="450" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="17" font-weight="700" fill="#d2e1d8">BUILD 42</text>
+<text x="205" y="450" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" fill="#a5b7b0">CLIENT SIDE  /  LUA</text>
+</svg>
