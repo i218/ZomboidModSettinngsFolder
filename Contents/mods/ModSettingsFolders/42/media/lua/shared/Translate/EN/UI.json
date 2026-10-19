@@ -1,0 +1,14 @@
+{
+  "UI_MSF_SaveFailed": "Could not save folders. Your settings were not changed.",
+  "UI_MSF_Rename": "Rename folder",
+  "UI_MSF_New": "New folder",
+  "UI_MSF_Duplicate": "A folder with this name already exists.",
+  "UI_MSF_InvalidName": "Enter a short name (up to 160 characters, no control characters).",
+  "UI_MSF_All": "All sections",
+  "UI_MSF_Unfiled": "Unfiled",
+  "UI_MSF_Move": "Move to folder",
+  "UI_MSF_Up": "Move folder up",
+  "UI_MSF_Down": "Move folder down",
+  "UI_MSF_Delete": "Remove folder (keep sections)",
+  "UI_MSF_Navigate": "Folders / settings"
+}
