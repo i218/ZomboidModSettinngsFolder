@@ -1,0 +1,5 @@
+[h1]v0.1.3[/h1]
+[list]
+[*]Fixed missing folder controls when another mod moves its settings to a separate tab.
+[*]Kept independent settings tabs at their original width.
+[/list]

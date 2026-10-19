@@ -84,7 +84,7 @@ table.remove(PZAPI.ModOptions.Data)
 -- Original builder failures must restore all temporary instance hooks.
 local broken=newOptions(1280)
 local ok=pcall(F.Capture.build,broken,function() error('original failure') end,900)
-assert(not ok and broken.width==1280 and own(broken,'getWidth')==nil and own(broken,'addHorizontalLine')==nil)
+assert(not ok and broken.width==1280 and own(broken,'getWidth')==nil and own(broken,'addHorizontalLine')==nil and own(broken,'addPage')==nil)
 -- Failure after native page reparenting rolls back to the native tab.
 local oldRefresh=F.UI.refresh;F.UI.refresh=function() error('injected navigation failure') end
 local rollback=newOptions(1280);rollback:addModOptionsPanel();F.UI.refresh=oldRefresh

@@ -10,13 +10,12 @@ local function children(page)
 end
 -- Build the ORIGINAL forms exactly once. Keep every GameOption and option.element.
 function C.build(owner,builder,width)
-    local originalWidth=owner.width;local rawWidth=own(owner,"getWidth");local rawHeader=own(owner,"addHorizontalLine")
-    local header=owner.addHorizontalLine;local definitions={};local ids={};local supported=true
-    for _,options in ipairs(PZAPI.ModOptions.Data) do
-        if ids[options.modOptionsID] then supported=false end
-        ids[options.modOptionsID]=true;definitions[#definitions+1]=options
-    end
-    local groups={};local seen={};local page;local current
+    local originalWidth=owner.width
+    local rawWidth=own(owner,"getWidth");local rawHeader=own(owner,"addHorizontalLine");local rawPage=own(owner,"addPage")
+    local header,addPage=owner.addHorizontalLine,owner.addPage
+    local definitions,groups,seen={},{},{}
+    local page,current;local targetActive=false;local reason
+    local function reject(message) if not reason then reason=message end end
     local function finish()
         if not current then return end
         for _,child in ipairs(children(page)) do
@@ -26,26 +25,52 @@ function C.build(owner,builder,width)
                 current.bottom=math.max(current.bottom,child:getY()+child:getHeight())
             end
         end
+        current=nil
     end
-    owner.width=width;owner.getWidth=function() return width end
+    owner.getWidth=function() return targetActive and width or originalWidth end
+    owner.addPage=function(self,name,...)
+        finish()
+        targetActive=false;self.width=originalWidth
+        local isMods=name==getText("UI_mainscreen_mods")
+        if isMods and not page then
+            -- Wrappers may filter Data before calling the stock builder, or load()
+            -- may register settings. Snapshot the registry actually used on this page.
+            local ids={}
+            for _,options in ipairs(PZAPI.ModOptions.Data) do
+                if ids[options.modOptionsID] then reject("duplicate section IDs on Mods page") end
+                ids[options.modOptionsID]=true;definitions[#definitions+1]=options
+            end
+            targetActive=not reason and #definitions>0
+            if targetActive then self.width=width end
+        elseif isMods then reject("multiple native Mods pages") end
+        local result=addPage(self,name,...)
+        if isMods and not page then
+            page=self.mainPanel
+            for _,child in ipairs(children(page)) do seen[child]=true end
+        end
+        return result
+    end
     owner.addHorizontalLine=function(self,y,text)
-        if not page then page=self.mainPanel;for _,child in ipairs(children(page)) do seen[child]=true end end
-        if self.mainPanel~=page then supported=false end
+        -- Other mods may append their own tabs and leave mainPanel pointing there.
+        -- Their headers, layout and controls must remain entirely independent.
+        if not page or self.mainPanel~=page then return header(self,y,text) end
         finish()
         local options=definitions[#groups+1]
-        if not options or text~=getText(options.name) then supported=false end
+        if not options or text~=getText(options.name) then reject("section header mismatch at "..(#groups+1)) end
         current={id=options and options.modOptionsID or "",name=text,nodes={},top=self.addY+y,bottom=self.addY+y}
         groups[#groups+1]=current
         return header(self,y,text)
     end
     local ok,result=pcall(builder,owner)
-    owner.width=originalWidth;owner.getWidth=rawWidth;owner.addHorizontalLine=rawHeader
+    owner.width=originalWidth;owner.getWidth=rawWidth;owner.addHorizontalLine=rawHeader;owner.addPage=rawPage
     if not ok then error(result) end
     finish()
-    if owner.mainPanel~=page or #groups~=#definitions then supported=false end
-    if not supported or not page or #groups==0 then
-        if owner.mainPanel then owner.mainPanel:setWidth(originalWidth) end
-        return nil,"custom builder or ambiguous sections; keeping native controls"
+    if not page then reject("native Mods page not found")
+    elseif #groups~=#definitions then reject("Mods section count differs: "..#groups.."/"..#definitions)
+    elseif #groups==0 then reject("no registered Mods sections") end
+    if reason then
+        if page then page:setWidth(originalWidth) end
+        return nil,reason.."; keeping native controls"
     end
     for _,group in ipairs(groups) do
         group.active=true

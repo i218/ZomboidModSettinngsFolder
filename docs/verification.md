@@ -1,4 +1,4 @@
-# Verification — 0.1.2
+# Verification — 0.1.3
 
 Date: 2026-10-19. Independent mod; installed game files and user configuration were not changed. No live game was launched for these checks.
 
@@ -35,3 +35,11 @@ Two runtime differences were addressed: this Kahlua's `rawget` traverses table m
 Enable the mod and restart, then test Options → Mods both from the main menu and a running save. Check Russian/English labels, long names, scrolling, font sizes, color popup placement, real keybind dialogs, gamepad focus and Apply/Back confirmation. Change several settings, navigate folders, cancel and reopen; repeat with Apply. Restart to check folder persistence; disable/re-enable a mod to check retained membership.
 
 Installed Viewpoint wraps the native builder and MPOptimiser hooks rendering; these patterns informed chaining and control preservation. Full coexistence with those actual mods and other UI replacements is not established by the automated doubles. Dedicated-server joining and client checksum acceptance also remain untested. The mod sends no network commands and has no server component.
+
+## Separate settings tabs regression (0.1.3)
+
+The user's log reported `native settings retained: custom builder or ambiguous sections`; the folder sidebar was never attached. The installed Project A-Life wrapper filters its own section out of `PZAPI.ModOptions.Data`, builds the native Mods page, restores the registry, then appends a separate page and leaves `mainPanel` pointing there. The old capture assumed one unfiltered registry and one final page, so it rejected this valid arrangement after narrowing the form.
+
+Capture now identifies the native Mods page through `addPage`, snapshots the effective registry at that point, and keeps other pages at their original width. Only headers and controls belonging to the target page are captured. Original page-builder hooks are restored on success or failure. Duplicate-ID fallback is detected before the page is narrowed.
+
+The regression was reproduced with the old capture and verified with the fix using the installed Kahlua, native settings builder and the actual installed Project A-Life `Prefs.addPanels` method. That method is extracted into ignored test output when `Test.ps1 -SplitTabReference <ALifeMenuPrefs.lua>` is supplied; the third-party source is not distributed. The default suite also covers the same filtered-registry pattern, custom tabs before/after Mods, late registration during `load`, folder-button callbacks and isolation of the other tab. `-CaptureOverride <old Capture.lua>` supports recording the failing baseline. UI primitives remain doubles; this does not replace live game acceptance.
