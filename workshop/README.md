@@ -11,4 +11,4 @@ This folder contains source metadata and original cover artwork. Nothing here pu
 
 The generated upload folder contains only `workshop.txt`, `preview.png`, and `Contents/mods/ModSettingsFolders` with mod files and the MIT license. No Git history, EXE, ZIP, test harness, user configuration, logs or development tools are included. The authoring SVG and generator stay in the repository and are not uploaded.
 
-The release is still marked as an early test version: local GUI and multiplayer acceptance are pending. The native validator checks package structure; it does not establish live gameplay compatibility, successful publication, or acceptance of Steam's legal agreement.
+The native validator checks package structure; it does not establish live gameplay compatibility, successful publication, or acceptance of Steam's legal agreement.
