@@ -1,6 +1,8 @@
 name=Mod Settings Folders
 id=ModSettingsFolders
 author=i218
-description=Organize vanilla Build 42 mod settings into local folders. No Java or server component required.
-modversion=0.1.1
+description=Organize mod settings into collapsible folders.
+modversion=0.1.2
 versionMin=42.0
+icon=icon.png
+poster=poster.png

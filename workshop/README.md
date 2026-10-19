@@ -2,7 +2,7 @@
 
 This folder contains source metadata and original cover artwork. Nothing here publishes or uploads to Steam. The game and Steam client are not launched by the build or validation scripts.
 
-1. Run `python -B workshop/Make-Preview.py` only when changing the artwork (Pillow + Windows Segoe UI fonts). The generated SVG is editable source; PNG is the upload image.
+1. Run `python -B workshop/Make-Preview.py` only when changing the artwork (Pillow + Windows Segoe UI fonts). The generated SVG is editable source; PNG is the upload image. Run `python -B workshop/Make-GameImages.py` to render the text-free 256px in-game list icon and copy the 512px cover to the in-game poster. Both are stored in `common` and referenced by `42/mod.info`.
 2. Run `./Build-Workshop.ps1`. The result is `build/workshop/<modversion>/ModSettingsFolders`.
 3. Run `./Test-Workshop.ps1 -GameDirectory <game> -JdkDirectory <JDK>`. It checks an explicit inventory, byte-identical mod sources, metadata and PNG, then calls the installed game's `SteamWorkshopItem` validator. No Steam session, account credentials or upload calls are used.
 4. When ready to publish manually, copy only that generated **ModSettingsFolders** folder to your Zomboid user directory's **Workshop** folder (normally `%USERPROFILE%/Zomboid/Workshop`). For `-cachedir`, use that user directory. Do not copy the repository.

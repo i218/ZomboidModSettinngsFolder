@@ -1,0 +1,6 @@
+[h1]v0.1.2[/h1]
+[list]
+[*]Added an in-game icon for the mod list.
+[*]Added a poster for the mod details panel.
+[*]Updated the short in-game description.
+[/list]

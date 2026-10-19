@@ -42,8 +42,14 @@ findings = set()
 
 
 def scan(label, raw):
-    if label.endswith("/workshop/preview.png"):
-        # This one project asset is a rasterized vector cover. Reject metadata chunks.
+    image_sizes = {
+        "/workshop/preview.png": (512,512),
+        "/Contents/mods/ModSettingsFolders/common/icon.png": (256,256),
+        "/Contents/mods/ModSettingsFolders/common/poster.png": (512,512),
+    }
+    image_size = next((size for suffix,size in image_sizes.items() if label.endswith(suffix)),None)
+    if image_size:
+        # Known project artwork only. Reject textual/EXIF metadata chunks.
         valid = raw.startswith(b"\x89PNG\r\n\x1a\n")
         offset = 8
         chunks = []
@@ -62,7 +68,7 @@ def scan(label, raw):
             if zlib.crc32(kind + data) & 0xffffffff != crc:
                 valid = False
                 break
-            if kind == b"IHDR" and (len(data) != 13 or struct.unpack(">II", data[:8]) != (512,512)):
+            if kind == b"IHDR" and (len(data) != 13 or struct.unpack(">II", data[:8]) != image_size):
                 valid = False
                 break
             chunks.append(kind)
