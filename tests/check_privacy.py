@@ -47,7 +47,11 @@ def scan(label, raw):
         return
     for line_number, line in enumerate(text.splitlines(), 1):
         for category, pattern in RULES.items():
-            if pattern.search(line):
+            candidate = line
+            if category == "ip-address" and label.endswith("/installer/app.manifest"):
+                # A Windows assembly identity requires a four-part version, not an IP.
+                candidate = re.sub(r'\bversion="[0-9]+(?:\.[0-9]+){3}"', 'version=""', line)
+            if pattern.search(candidate):
                 findings.add((label, line_number, category))
         for match in EMAIL.finditer(line):
             if not match.group().endswith("@users.noreply.github.com"):

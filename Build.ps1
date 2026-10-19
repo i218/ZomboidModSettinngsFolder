@@ -15,7 +15,7 @@ try {
         $relative = $file.FullName.Substring($source.Length + 1).Replace('\', '/')
         [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $file.FullName, "ModSettingsFolders/$relative", [IO.Compression.CompressionLevel]::Optimal) | Out-Null
     }
-    foreach ($name in @('README.md','README.ru.md','LICENSE','docs/verification.md')) {
+    foreach ($name in @('README.md','README.ru.md','LICENSE','docs/verification.md','docs/installer.md')) {
         [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, (Join-Path $root $name), "ModSettingsFolders/$name", [IO.Compression.CompressionLevel]::Optimal) | Out-Null
         New-Item -ItemType Directory -Path (Split-Path -Parent (Join-Path $out $name)) -Force | Out-Null
         Copy-Item -LiteralPath (Join-Path $root $name) -Destination (Join-Path $out $name)

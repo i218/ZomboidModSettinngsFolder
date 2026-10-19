@@ -1,4 +1,4 @@
-# Verification — 0.1.0
+# Verification — 0.1.1
 
 Date: 2026-10-19. Independent mod; installed game files and user configuration were not changed. No live game was launched for these checks.
 
