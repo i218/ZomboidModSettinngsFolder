@@ -25,5 +25,5 @@
 <rect x="385" y="324" width="47" height="5" rx="2" fill="#b7cbc0"/>
 <rect x="40" y="440" width="137" height="38" rx="8" fill="#263a33"/>
 <text x="57" y="450" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="17" font-weight="700" fill="#d2e1d8">BUILD 42</text>
-<text x="205" y="450" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" fill="#a5b7b0">CLIENT SIDE  /  LUA</text>
+<text x="205" y="450" dominant-baseline="text-before-edge" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" fill="#a5b7b0">CLIENT SIDE</text>
 </svg>

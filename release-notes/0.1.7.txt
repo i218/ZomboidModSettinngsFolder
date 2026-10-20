@@ -1,0 +1,6 @@
+[h1]v0.1.7[/h1]
+[list]
+[*]Added case-insensitive search across all settings folders, including collapsed folders. Ctrl+F focuses the search.
+[*]Added optional one-way folder import from ModFolders. Existing folders and overlapping assignments merge; the source mod remains unchanged.
+[*]Simplified the cover and in-game poster footer to CLIENT SIDE.
+[/list]
