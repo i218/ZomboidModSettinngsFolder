@@ -33,6 +33,7 @@ $sources = @(
     (Join-Path $client 'MSF/Store.lua'),
     (Join-Path $root 'tests/ModelTests.lua'),
     $captureSource,
+    (Join-Path $client 'MSF/ContextMenu.lua'),
     (Join-Path $client 'MSF/UI.lua'),
     (Join-Path $client 'ModSettingsFolders.lua'),
     (Join-Path $root 'tests/IntegrationTests.lua')
@@ -48,3 +49,17 @@ if ($SplitTabReference) {
 $sources += (Join-Path $root 'tests/CompatibilityTests.lua')
 & (Join-Path $GameDirectory 'jre64/bin/java.exe') -cp "$jar;$out" KahluaCheck @sources
 if ($LASTEXITCODE) { throw 'Kahlua checks failed' }
+
+# Exercise real native menu methods with no player, independently of UI menu doubles.
+$menuSources = @(
+    (Join-Path $GameDirectory 'stdlib.lua'),
+    (Join-Path $root 'tests/Bootstrap.lua'),
+    (Join-Path $root 'tests/ContextBootstrap.lua'),
+    (Join-Path $GameDirectory 'media/lua/client/ISUI/ISContextMenu.lua'),
+    (Join-Path $client 'MSF/Model.lua'),
+    (Join-Path $client 'MSF/ContextMenu.lua'),
+    (Join-Path $client 'MSF/UI.lua'),
+    (Join-Path $root 'tests/ContextTests.lua')
+)
+& (Join-Path $GameDirectory 'jre64/bin/java.exe') -cp "$jar;$out" KahluaCheck @menuSources
+if ($LASTEXITCODE) { throw 'Native context menu checks failed' }

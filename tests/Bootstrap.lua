@@ -126,7 +126,13 @@ end
 
 ISTickBox=UI:derive("ISTickBox")
 function ISLabel:new(x,y,h,text) local o=UI.new(self,x,y,200,h);o.text=text;return o end
-ISContextMenu={}
+ISContextMenu=UI:derive("ISContextMenu")
+function UI:removeFromUIManager() self.removed=true end
+function UI:bringToTop() end
+function UI:setForceCursorVisible() end
+function ISContextMenu:setFontFromOption() end
+function ISContextMenu:hideAndChildren() self:setVisible(false);for _,m in ipairs(self.instanceMap or {}) do m:hideAndChildren() end end
+function ISContextMenu:new(x,y,w,h) local m=UI.new(self,x,y,w,h);lastContext=m;return m end
 function ISContextMenu.get() local m={options={}};setmetatable(m,{__index=ISContextMenu});lastContext=m;return m end
 function ISContextMenu:getNew() return ISContextMenu.get() end
 function ISContextMenu:addOption(text,target,fn,...) local o={text=text,target=target,fn=fn,args={...}};self.options[#self.options+1]=o;return o end

@@ -1,0 +1,6 @@
+[h1]v0.1.4[/h1]
+[list]
+[*]Fixed right-click folder and section menus failing in main-menu settings, preventing sections from being moved into folders.
+[*]Settings context menus now work without a loaded game and remain separate from in-game context menus.
+[*]Fixed submenu ownership and cleaned up menus when reopening or rebuilding folder navigation.
+[/list]

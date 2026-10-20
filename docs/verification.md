@@ -1,4 +1,4 @@
-# Verification — 0.1.3
+# Verification — 0.1.4
 
 Date: 2026-10-19. Independent mod; installed game files and user configuration were not changed. No live game was launched for these checks.
 
@@ -43,3 +43,20 @@ The user's log reported `native settings retained: custom builder or ambiguous s
 Capture now identifies the native Mods page through `addPage`, snapshots the effective registry at that point, and keeps other pages at their original width. Only headers and controls belonging to the target page are captured. Original page-builder hooks are restored on success or failure. Duplicate-ID fallback is detected before the page is narrowed.
 
 The regression was reproduced with the old capture and verified with the fix using the installed Kahlua, native settings builder and the actual installed Project A-Life `Prefs.addPanels` method. That method is extracted into ignored test output when `Test.ps1 -SplitTabReference <ALifeMenuPrefs.lua>` is supplied; the third-party source is not distributed. The default suite also covers the same filtered-registry pattern, custom tabs before/after Mods, late registration during `load`, folder-button callbacks and isolation of the other tab. `-CaptureOverride <old Capture.lua>` supports recording the failing baseline. UI primitives remain doubles; this does not replace live game acceptance.
+
+
+## Context menu before a world is loaded (0.1.4)
+
+The native `ISContextMenu.get(0, ...)` unconditionally calls `hideAndChildren()` on
+`getPlayerContextMenu(0)`. This returns nil in main-menu options. The installed
+Viewpoint QOL wrapper only catches and rethrows the same error; it is not the cause.
+Settings now own a native-derived context menu, submenu registry and mouse hit
+lookup. No player context is created or replaced. Reopening disposes the previous
+menu tree; detaching the navigation also disposes it.
+
+`Test.ps1` also loads the installed, unmodified `ISContextMenu.lua` in a separate
+Kahlua run. It first reproduces the null-player failure, then verifies section and
+folder actions, submenu lookup and hit testing, move callbacks, outside click,
+gamepad cancellation/focus return, reopening/disposal and isolation from a loaded
+world's menu. Renderer/UI manager primitives remain test doubles; no game window
+or user settings are changed.

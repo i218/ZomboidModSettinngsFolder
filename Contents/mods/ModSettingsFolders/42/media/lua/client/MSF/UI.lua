@@ -1,5 +1,6 @@
 require "MSF/Capture"
 require "MSF/Store"
+require "MSF/ContextMenu"
 require "ISUI/ISPanelJoypad"
 require "ISUI/ISScrollingListBox"
 require "ISUI/ISButton"
@@ -87,13 +88,15 @@ function U:refresh()
     list:setYScroll(scroll)
 end
 function U:context(row,x,y)
-    local menu=ISContextMenu.get(0,x or getMouseX(),y or getMouseY())
+    if self.contextMenu then self.contextMenu:dispose() end
+    local menu=ModSettingsFolders.ContextMenu:create(x or getMouseX(),y or getMouseY(),self.tree)
+    self.contextMenu=menu
     menu:addOption(getText("UI_MSF_New"),self,U.newFolder)
     menu:addOption(getText("UI_MSF_All"),self,function(controller) controller:select({kind="all"}) end)
     if not row then return end
     if row.kind=="section" then
         local option=menu:addOption(getText("UI_MSF_Move"),nil,nil)
-        local sub=ISContextMenu:getNew(menu);menu:addSubMenu(option,sub)
+        local sub=ModSettingsFolders.ContextMenu:create(menu:getX(),menu:getY(),self.tree,menu);menu:addSubMenu(option,sub)
         sub:addOption(getText("UI_MSF_Unfiled"),self,U.move,row.id,nil)
         for _,f in ipairs(self.state.folders) do sub:addOption(f.name,self,U.move,row.id,f.id) end
     elseif row.kind=="folder" and row.id~="unfiled" then
@@ -119,6 +122,7 @@ function U:layout()
 end
 function U.detach(owner)
     local self=owner.msfController;if not self then return end
+    if self.contextMenu then self.contextMenu:dispose();self.contextMenu=nil end
     local visible=self.host:getIsVisible()
     owner.tabs:replaceView(self.host,self.page)
     self.host:removeChild(self.page);owner.tabs:removeChild(self.host);owner.tabs:addChild(self.page)
