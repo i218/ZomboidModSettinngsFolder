@@ -32,14 +32,14 @@ function S.load()
     end
     S.state=state or ModSettingsFolders.Model.new();return S.state
 end
-function S.save()
+function S.save(candidate)
     if S.blocked then return false,"unsupported or damaged layout; original file preserved" end
-    local text=ModSettingsFolders.Model.encode(S.load())
+    local text=ModSettingsFolders.Model.encode(candidate or S.load())
     local ok,err=pcall(function()
         if S.good then write(S.backup,S.good) end
         write(S.file,text)
     end)
-    if ok then S.good=text end
+    if ok then S.good=text;if candidate then S.state=candidate end end
     return ok,err
 end
 return S

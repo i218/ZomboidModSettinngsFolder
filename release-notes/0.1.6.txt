@@ -1,0 +1,6 @@
+[h1]v0.1.6[/h1]
+[list]
+[*]Added optional one-way folder import from ModFolders through Import settings from... in Options > Mods.
+[*]Existing and imported folders merge by name and shared sections; repeating an import does not create duplicates.
+[*]Import results show matched sections and mods without a unique match. ModFolders and its configuration remain unchanged.
+[/list]

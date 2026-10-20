@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$GameDirectory,
     [string]$JdkDirectory = $env:JAVA_HOME,
     [string]$SplitTabReference,
+    [string]$ModFoldersReference,
     [string]$CaptureOverride
 )
 $ErrorActionPreference = 'Stop'
@@ -31,6 +32,7 @@ $sources = @(
     $fixture,
     (Join-Path $client 'MSF/Model.lua'),
     (Join-Path $client 'MSF/Store.lua'),
+    (Join-Path $client 'MSF/Import.lua'),
     (Join-Path $root 'tests/ModelTests.lua'),
     $captureSource,
     (Join-Path $client 'MSF/ContextMenu.lua'),
@@ -46,6 +48,15 @@ if ($SplitTabReference) {
     [IO.File]::WriteAllText($referenceFixture, "MSF_ReferencePrefs={}`nlocal Prefs=MSF_ReferencePrefs`n" + $method.Value, [Text.UTF8Encoding]::new($false))
     $sources += $referenceFixture
 }
+if ($ModFoldersReference) {
+    $reference = Get-Content -LiteralPath $ModFoldersReference -Raw
+    $codec = [regex]::Match($reference, '(?s)local function encodeValue\(value\).*?(?=local function rebuildFolderIndex)')
+    if (!$codec.Success) { throw 'Installed ModFolders codec not found' }
+    $codecFixture = Join-Path $out 'InstalledModFoldersCodec.lua'
+    [IO.File]::WriteAllText($codecFixture, $codec.Value + "`nMSF_ModFoldersCodec={encode=encodeValue,v1=decodeValueV1,v2=decodeValueV2}`n", [Text.UTF8Encoding]::new($false))
+    $sources += $codecFixture
+}
+$sources += (Join-Path $root 'tests/ImportTests.lua')
 $sources += (Join-Path $root 'tests/CompatibilityTests.lua')
 & (Join-Path $GameDirectory 'jre64/bin/java.exe') -cp "$jar;$out" KahluaCheck @sources
 if ($LASTEXITCODE) { throw 'Kahlua checks failed' }
@@ -58,6 +69,7 @@ $menuSources = @(
     (Join-Path $GameDirectory 'media/lua/client/ISUI/ISContextMenu.lua'),
     (Join-Path $client 'MSF/Model.lua'),
     (Join-Path $client 'MSF/ContextMenu.lua'),
+    (Join-Path $client 'MSF/Import.lua'),
     (Join-Path $client 'MSF/UI.lua'),
     (Join-Path $root 'tests/ContextTests.lua')
 )

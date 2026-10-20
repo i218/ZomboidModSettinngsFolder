@@ -12,5 +12,10 @@
   "UI_MSF_Delete": "Remove folder (keep sections)",
   "UI_MSF_Navigate": "Folders / settings",
   "UI_MSF_Search": "Search sections...",
-  "UI_MSF_SearchHint": "Search all folders (Ctrl+F)"
+  "UI_MSF_SearchHint": "Search all folders (Ctrl+F)",
+  "UI_MSF_Import": "Import settings from...",
+  "UI_MSF_ImportHint": "Merge folders from ModFolders. The source mod and its configuration remain unchanged.",
+  "UI_MSF_ImportFailed": "Could not read ModFolders folders. The source file may be missing, damaged or unsupported. Your layout is unchanged.",
+  "UI_MSF_ImportLimit": "The merged layout exceeds the folder or section limits. Your layout is unchanged.",
+  "UI_MSF_Imported": "Import complete. New folders: %1. Merged folders: %2. Matched sections: %3. Mods without a unique settings match: %4."
 }

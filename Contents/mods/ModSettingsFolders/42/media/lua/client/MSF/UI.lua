@@ -1,5 +1,6 @@
 require "MSF/Capture"
 require "MSF/Store"
+require "MSF/Import"
 require "MSF/ContextMenu"
 require "ISUI/ISPanelJoypad"
 require "ISUI/ISScrollingListBox"
@@ -12,15 +13,32 @@ local U={};ModSettingsFolders.UI=U
 local M,S,C=ModSettingsFolders.Model,ModSettingsFolders.Store,ModSettingsFolders.Capture
 local function focus(ui,data) if data then data.focus=ui;updateJoypadFocus(data) end end
 local function height() return math.max(26,getTextManager():getFontHeight(UIFont.Small)+10) end
-function U.message(key)
+function U.message(key,...)
     local screen=getCore()
-    local modal=ISModalDialog:new(screen:getScreenWidth()/2-210,screen:getScreenHeight()/2-85,420,170,getText(key),false,nil,nil)
+    local modal=ISModalDialog:new(screen:getScreenWidth()/2-210,screen:getScreenHeight()/2-85,420,170,getText(key,...),false,nil,nil)
     modal:initialise();modal:addToUIManager()
 end
 function U:save()
     local ok,err=S.save()
     if not ok then print("[ModSettingsFolders] layout save failed: "..tostring(err));U.message("UI_MSF_SaveFailed") end
     self:refresh()
+end
+function U:importFolders()
+    local I=ModSettingsFolders.Import
+    if not I.available() then return end
+    local ok,source=pcall(I.read)
+    if not ok or not source then U.message("UI_MSF_ImportFailed");return end
+    local candidate,report=I.merge(self.state,source,self.capture.groups)
+    if not candidate then U.message("UI_MSF_ImportLimit");return end
+    local saved=S.save(candidate)
+    if not saved then U.message("UI_MSF_SaveFailed");return end
+    self.state=candidate;self:refresh()
+    U.message("UI_MSF_Imported",report.created,report.merged,report.assigned,report.skipped)
+end
+function U:importMenu()
+    if self.contextMenu then self.contextMenu:dispose() end
+    self.contextMenu=ModSettingsFolders.ContextMenu:create(self.importButton:getAbsoluteX(),self.importButton:getAbsoluteY()+self.importButton:getHeight(),self.tree)
+    self.contextMenu:addOption("ModFolders",self,U.importFolders)
 end
 function U:newFolder()
     self:prompt(nil)
@@ -131,7 +149,9 @@ function U:layout()
     end
     self.search:setWidth(self.nav:getWidth()-16)
     self.create:setWidth(self.nav:getWidth()-16)
-    self.tree:setWidth(self.nav:getWidth()-16);self.tree:setHeight(math.max(0,self.nav:getHeight()-2*buttonHeight-32))
+    local treeY=2*buttonHeight+24
+    if self.importButton then self.importButton:setWidth(self.nav:getWidth()-16);treeY=treeY+buttonHeight+8 end
+    self.tree:setY(treeY);self.tree:setWidth(self.nav:getWidth()-16);self.tree:setHeight(math.max(0,self.nav:getHeight()-treeY-8))
 end
 function U.detach(owner)
     local self=owner.msfController;if not self then return end
@@ -182,6 +202,10 @@ function U.attach(owner,capture,navWidth,compact)
         return false
     end
     local create=ISButton:new(8,height()+16,navWidth-16,height(),getText("UI_MSF_New"),self,U.newFolder);create:initialise();nav:addChild(create);self.create=create
+    if ModSettingsFolders.Import.available() then
+        local import=ISButton:new(8,2*height()+24,navWidth-16,height(),getText("UI_MSF_Import"),self,U.importMenu)
+        import:initialise();import:setTooltip(getText("UI_MSF_ImportHint"));nav:addChild(import);self.importButton=import
+    end
     local list=ISScrollingListBox:new(8,2*height()+24,navWidth-16,math.max(0,page:getHeight()-2*height()-32));list:initialise();list:instantiate()
     list:setFont(UIFont.Small,4);list.itemheight=height();nav:addChild(list);self.tree=list
     list:setOnMouseDownFunction(self,U.select)

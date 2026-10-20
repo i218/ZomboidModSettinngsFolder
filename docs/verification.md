@@ -1,4 +1,4 @@
-# Verification — 0.1.5
+# Verification — 0.1.6
 
 Date: 2026-10-19. Independent mod; installed game files and user configuration were not changed. No live game was launched for these checks.
 
@@ -74,3 +74,26 @@ Keyboard dispatch was inspected in the installed UIManager: only visible top-lev
 UI elements requesting key events receive onKeyPress. MainOptions therefore owns
 the temporary shortcut handlers; they chain existing handlers and are restored on
 detach. Tests use UI primitives as doubles; live keyboard/UI acceptance is separate.
+
+
+## ModFolders import (0.1.6)
+
+Inspected installed ModFolders v0.2.26: local-only MF state is not exported; its
+saved ModFolders.cfg uses v2 comma-separated UTF-16 hex values and legacy v1
+percent escapes. The importer opens that file with create=false and never loads,
+executes or modifies ModFolders code. Source parsing is bounded to 512 KiB,
+99 folders and 2000 members, with strict versions/records/references. Matching
+uses captured settings IDs/names and read-only mod metadata. Unknown and ambiguous
+matches are reported, not guessed. No external code is included in runtime files.
+
+Import merges a separate candidate layout by case-insensitive folder names and
+shared sections, preserving all existing memberships in the merged components.
+Only successful local persistence publishes the candidate in Store/UI. Limits or
+write failure do not replace live state; the previous valid backup remains usable.
+
+Test.ps1 -ModFoldersReference <installed ModFolders.lua> extracts the actual
+installed codec into ignored test output for comparison with the independent
+reader. ImportTests covers v1/v2 Unicode, folder merging and overlap chains,
+unmatched/ambiguous titles, idempotence, folder/member bounds, installed-only UI,
+source-file immutability, missing/corrupt data and failed-write rollback. Existing
+search, native-menu and separate-tab suites still run. Tests do not launch the game.
