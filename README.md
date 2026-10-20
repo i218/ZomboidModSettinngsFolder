@@ -4,14 +4,15 @@ Standalone Project Zomboid Build 42 client mod. Organizes sections in **Options 
 
 ## Install
 
-Run `ModSettingsFolders-Setup-0.1.4.exe` and choose the Zomboid user directory. Close the game first. Existing mod files are backed up under `ModSettingsFoldersBackups`; local settings and the enabled-mod list are preserved. Enable the mod and restart after installation. The installer is unsigned; no administrator rights or downloads are required. Windows .NET Framework 4.5 or newer is required (normally present on Windows 10/11).
+Run `ModSettingsFolders-Setup-0.1.5.exe` and choose the Zomboid user directory. Close the game first. Existing mod files are backed up under `ModSettingsFoldersBackups`; local settings and the enabled-mod list are preserved. Enable the mod and restart after installation. The installer is unsigned; no administrator rights or downloads are required. Windows .NET Framework 4.5 or newer is required (normally present on Windows 10/11).
 
-For manual installation, extract `ModSettingsFolders-0.1.4.zip` into your Zomboid user directory's `mods` folder. The resulting path must be `mods/ModSettingsFolders/42/mod.info`. Enable **Mod Settings Folders** and restart the game to load its main-menu code. The Zomboid user directory is normally `%USERPROFILE%/Zomboid`, but `-cachedir` can change it.
+For manual installation, extract `ModSettingsFolders-0.1.5.zip` into your Zomboid user directory's `mods` folder. The resulting path must be `mods/ModSettingsFolders/42/mod.info`. Enable **Mod Settings Folders** and restart the game to load its main-menu code. The Zomboid user directory is normally `%USERPROFILE%/Zomboid`, but `-cachedir` can change it.
 
 No Java bridge, Mod Options Workshop dependency, server installation or aircraft mod is required. It uses the built-in Build 42 `PZAPI.ModOptions` registry. Build 41 is unsupported.
 
 ## Use
 
+- Use the search box above **New folder** to find sections across every folder, including collapsed folders. Matching ignores case and also accepts folder names and section IDs. **Ctrl+F** focuses the search; clearing it restores the folder tree.
 - Open Options → Mods. Create a folder with **New folder**.
 - Right-click a section → **Move to folder**. Right-click a folder to rename, reorder or remove it.
 - Click a folder to collapse/expand it; click a section to show its settings. **All sections** shows the complete form.
@@ -35,6 +36,6 @@ Limits: 99 folders, 160 UTF-16 code units per name, 2000 retained memberships, 5
 
 `./Test.ps1 -GameDirectory <installed game> -JdkDirectory <JDK>` runs the installed game's Kahlua VM with its actual `PZAPI.ModOptions`, `GameOption` and settings form builder. UI and files are test doubles; no game session or user configuration is opened. JDK is needed only for this test harness, not for the mod. The JDK is found through `JAVA_HOME`, `javac` on PATH, or the explicit parameter.
 
-`./Build.ps1` creates a versioned, hash-manifested ZIP under `build/distributions/0.1.4`. Generated game-source test fixtures are not distributed. See [verification details](docs/verification.md).
+`./Build.ps1` creates a versioned, hash-manifested ZIP under `build/distributions/0.1.5`. Generated game-source test fixtures are not distributed. See [verification details](docs/verification.md).
 
 `./Build-Installer.ps1` builds a standalone Windows EXE with an embedded, SHA256-verified payload using the installed .NET Framework compiler. No NuGet or network is used. `-Rebuild` explicitly permits replacing the current version's EXE; previous version folders remain intact. See [installer checks](docs/installer.md).

@@ -10,5 +10,7 @@
   "UI_MSF_Up": "Папку выше",
   "UI_MSF_Down": "Папку ниже",
   "UI_MSF_Delete": "Удалить папку (сохранить разделы)",
-  "UI_MSF_Navigate": "Папки / настройки"
+  "UI_MSF_Navigate": "Папки / настройки",
+  "UI_MSF_Search": "Поиск разделов...",
+  "UI_MSF_SearchHint": "Поиск во всех папках (Ctrl+F)"
 }

@@ -40,7 +40,13 @@ function UI:setAnchorTop() end
 function UI:setFont() end
 function UI:drawRect() end
 function UI:setTooltip(value) self.tooltip=value end
-function UI:focus() end
+function UI:focus() self.focused=true end
+function UI:unfocus() self.focused=false end
+function UI:setPlaceholderText(value) self.placeholder=value end
+function UI:setClearButton(value) self.clearButton=value end
+function UI:setWantKeyEvents(value) self.wantKeyEvents=value end
+Keyboard={KEY_F=33}
+function isCtrlKeyDown() return testCtrl==true end
 function UI:prerender() end
 function UI:addChild(child) self.children[child.ID]=child;self.childrenInOrder[#self.childrenInOrder+1]=child;child.parent=self end
 function UI:removeChild(child) self.children[child.ID]=nil;for i,c in ipairs(self.childrenInOrder) do if c==child then table.remove(self.childrenInOrder,i);break end end end
@@ -85,6 +91,8 @@ function UI:replaceView(old,new)
     for _,view in ipairs(self.viewList) do if view.view==old then view.view=new;return old end end
 end
 function UI:insertNewLineOfButtons(...) self.joypadButtonsY[#self.joypadButtonsY+1]={...} end
+ISTextEntryBox=UI:derive("ISTextEntryBox")
+function ISTextEntryBox:new(text,x,y,w,h) local entry=UI.new(self,x,y,w,h);entry.text=text;return entry end
 ISPanelJoypad=UI:derive("ISPanelJoypad");ISScrollingListBox=UI:derive("ISScrollingListBox");ISButton=UI:derive("ISButton")
 ISColorPicker=UI:derive("ISColorPicker");ISLabel=UI:derive("ISLabel");ISTextBox=UI:derive("ISTextBox");ISModalDialog=UI:derive("ISModalDialog")
 ColorInfo={new=function(r,g,b,a) return {r=r,g=g,b=b,a=a} end}

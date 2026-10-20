@@ -1,6 +1,6 @@
-# Windows installer — 0.1.4
+# Windows installer — 0.1.5
 
-Run `ModSettingsFolders-Setup-0.1.4.exe`, close the game and choose your Zomboid user directory. The default is the current Windows user's Zomboid directory; a custom `-cachedir` location or its `mods` directory can be selected. The installer never changes the enabled-mod list. Enable Mod Settings Folders and restart the game afterwards.
+Run `ModSettingsFolders-Setup-0.1.5.exe`, close the game and choose your Zomboid user directory. The default is the current Windows user's Zomboid directory; a custom `-cachedir` location or its `mods` directory can be selected. The installer never changes the enabled-mod list. Enable Mod Settings Folders and restart the game afterwards.
 
 The EXE is offline, unsigned and runs as the current user. It requires Windows .NET Framework 4.5 or newer, normally included with Windows 10/11. No Java, download, telemetry, registry entry, service or administrator elevation is used.
 

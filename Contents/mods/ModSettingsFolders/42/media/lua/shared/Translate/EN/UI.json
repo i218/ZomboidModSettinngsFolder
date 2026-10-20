@@ -10,5 +10,7 @@
   "UI_MSF_Up": "Move folder up",
   "UI_MSF_Down": "Move folder down",
   "UI_MSF_Delete": "Remove folder (keep sections)",
-  "UI_MSF_Navigate": "Folders / settings"
+  "UI_MSF_Navigate": "Folders / settings",
+  "UI_MSF_Search": "Search sections...",
+  "UI_MSF_SearchHint": "Search all folders (Ctrl+F)"
 }

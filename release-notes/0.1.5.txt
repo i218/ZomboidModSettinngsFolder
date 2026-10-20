@@ -1,0 +1,6 @@
+[h1]v0.1.5[/h1]
+[list]
+[*]Added a search box above New folder. Search ignores case and finds sections across all folders, including collapsed folders.
+[*]Search also supports folder names and section IDs. Clearing the search restores the original folder tree.
+[*]Ctrl+F focuses the search and reveals folder navigation in narrow windows.
+[/list]

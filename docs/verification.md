@@ -1,4 +1,4 @@
-# Verification — 0.1.4
+# Verification — 0.1.5
 
 Date: 2026-10-19. Independent mod; installed game files and user configuration were not changed. No live game was launched for these checks.
 
@@ -60,3 +60,17 @@ folder actions, submenu lookup and hit testing, move callbacks, outside click,
 gamepad cancellation/focus return, reopening/disposal and isolation from a loaded
 world's menu. Renderer/UI manager primitives remain test doubles; no game window
 or user settings are changed.
+
+
+## Section search (0.1.5)
+
+The integration suite checks case-insensitive Cyrillic and Latin search, literal
+punctuation, section IDs and folder names, collapsed-folder matches, clearing the
+query without changing saved collapse state, compact navigation, Ctrl+F visibility
+guards and restoration of pre-existing keyboard handlers on detach. Search changes
+only navigation rows; native settings controls and pending edits are retained.
+Unicode test names enter Kahlua as Java strings, matching registry/translation input.
+Keyboard dispatch was inspected in the installed UIManager: only visible top-level
+UI elements requesting key events receive onKeyPress. MainOptions therefore owns
+the temporary shortcut handlers; they chain existing handlers and are restored on
+detach. Tests use UI primitives as doubles; live keyboard/UI acceptance is separate.

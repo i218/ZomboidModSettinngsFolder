@@ -4,6 +4,7 @@ require "MSF/ContextMenu"
 require "ISUI/ISPanelJoypad"
 require "ISUI/ISScrollingListBox"
 require "ISUI/ISButton"
+require "ISUI/ISTextEntryBox"
 require "ISUI/ISContextMenu"
 require "ISUI/ISTextBox"
 require "ISUI/ISModalDialog"
@@ -52,10 +53,16 @@ function U:toggleFolder(id)
     else local f=M.find(self.state,id);if f then f.collapsed=not f.collapsed end end
     self:save()
 end
+function U:focusSearch()
+    if not self.owner:getIsVisible() or not self.host:getIsVisible() then return false end
+    if self.compact then self.navVisible=true;self:layout() end
+    self.search:focus()
+    return true
+end
 function U:select(row)
     if not row then return end
     self.cursor=row
-    if row.kind=="folder" then self:toggleFolder(row.id);return end
+    if row.kind=="folder" then if not self.query or self.query=="" then self:toggleFolder(row.id) end;return end
     self.selected=row.kind=="section" and row.id or nil
     C.show(self.capture,self.selected)
     self:refresh()
@@ -63,6 +70,8 @@ function U:select(row)
 end
 function U:refresh()
     local list=self.tree;local scroll=list:getYScroll();list:clear()
+    local query=self.query or ""
+    local function matches(text) return string.find(string.lower(text),query,1,true)~=nil end
     local preferred,fallback
     local function add(text,row)
         local item=list:addItem(text,row)
@@ -77,8 +86,11 @@ function U:refresh()
         local entries={}
         for _,group in ipairs(groups) do
             local assigned=self.state.members[group.id]
-            if (id=="unfiled" and not assigned) or assigned==id then entries[#entries+1]=group end
+            if ((id=="unfiled" and not assigned) or assigned==id) and
+                (query=="" or matches(label) or matches(group.name) or matches(group.id)) then entries[#entries+1]=group end
         end
+        if query~="" and #entries==0 then return end
+        closed=closed and query==""
         add((closed and "[+] " or "[-] ")..label.." ("..#entries..")",{kind="folder",id=id})
         if not closed then for _,group in ipairs(entries) do add("    "..group.name,{kind="section",id=group.id}) end end
     end
@@ -117,12 +129,16 @@ function U:layout()
         self.nav:setWidth(self.navWidth);self.nav:setHeight(h)
         self.page:setX(self.navWidth+8);self.page:setY(0);self.page:setWidth(w-self.navWidth-8);self.page:setHeight(h)
     end
+    self.search:setWidth(self.nav:getWidth()-16)
     self.create:setWidth(self.nav:getWidth()-16)
-    self.tree:setWidth(self.nav:getWidth()-16);self.tree:setHeight(self.nav:getHeight()-buttonHeight-24)
+    self.tree:setWidth(self.nav:getWidth()-16);self.tree:setHeight(math.max(0,self.nav:getHeight()-2*buttonHeight-32))
 end
 function U.detach(owner)
     local self=owner.msfController;if not self then return end
     if self.contextMenu then self.contextMenu:dispose();self.contextMenu=nil end
+    if self.search then self.search:unfocus() end
+    owner.onKeyPress=self.originalKeyPress;owner.isKeyConsumed=self.originalKeyConsumed
+    owner:setWantKeyEvents(self.originalWantKeys==true)
     local visible=self.host:getIsVisible()
     owner.tabs:replaceView(self.host,self.page)
     self.host:removeChild(self.page);owner.tabs:removeChild(self.host);owner.tabs:addChild(self.page)
@@ -137,14 +153,36 @@ function U.attach(owner,capture,navWidth,compact)
     local page=capture.page;local tabs=owner.tabs
     if not tabs.replaceView then return nil end
     local self=setmetatable({owner=owner,page=page,capture=capture,state=S.load(),navWidth=navWidth,compact=compact,originalJoypad=page.onJoypadDown,originalGain=page.onGainJoypadFocus,originalDeactivate=page.onJoypadBeforeDeactivate},{__index=U})
+    self.originalKeyPress=owner.onKeyPress;self.originalKeyConsumed=owner.isKeyConsumed;self.originalWantKeys=owner.wantKeyEvents
     local host=ISPanelJoypad:new(0,tabs.tabHeight,owner:getWidth(),page:getHeight());host:initialise();host:instantiate();host:noBackground()
     host:setAnchorRight(true);host:setAnchorBottom(true)
     if tabs:replaceView(page,host)~=page then return nil end
     local visible=page:getIsVisible();tabs:removeChild(page);tabs:addChild(host);host:setVisible(visible)
     host:addChild(page);page:setVisible(true);self.host=host;owner.msfController=self
     local nav=ISPanelJoypad:new(0,0,navWidth,page:getHeight());nav:initialise();nav:instantiate();nav:noBackground();host:addChild(nav);self.nav=nav
-    local create=ISButton:new(8,8,navWidth-16,height(),getText("UI_MSF_New"),self,U.newFolder);create:initialise();nav:addChild(create);self.create=create
-    local list=ISScrollingListBox:new(8,height()+16,navWidth-16,page:getHeight()-height()-24);list:initialise();list:instantiate()
+    local search=ISTextEntryBox:new("",8,8,navWidth-16,height());search:initialise();search:instantiate()
+    search:setPlaceholderText(getText("UI_MSF_Search"));search:setTooltip(getText("UI_MSF_SearchHint"));search:setClearButton(true)
+    nav:addChild(search);self.search=search
+    search.target=self
+    search.onTextChangeFunction=function(controller,entry)
+        controller.query=string.lower(entry:getText():gsub("^%s+",""):gsub("%s+$",""))
+        controller.tree:setYScroll(0);controller:refresh()
+    end
+    local function shortcut(key)
+        return key==Keyboard.KEY_F and isCtrlKeyDown() and owner:getIsVisible() and host:getIsVisible()
+    end
+    owner:setWantKeyEvents(true)
+    owner.onKeyPress=function(panel,key)
+        if shortcut(key) then self:focusSearch();return end
+        if self.originalKeyPress then return self.originalKeyPress(panel,key) end
+    end
+    owner.isKeyConsumed=function(panel,key)
+        if shortcut(key) then return true end
+        if self.originalKeyConsumed then return self.originalKeyConsumed(panel,key) end
+        return false
+    end
+    local create=ISButton:new(8,height()+16,navWidth-16,height(),getText("UI_MSF_New"),self,U.newFolder);create:initialise();nav:addChild(create);self.create=create
+    local list=ISScrollingListBox:new(8,2*height()+24,navWidth-16,math.max(0,page:getHeight()-2*height()-32));list:initialise();list:instantiate()
     list:setFont(UIFont.Small,4);list.itemheight=height();nav:addChild(list);self.tree=list
     list:setOnMouseDownFunction(self,U.select)
     list.onRightMouseDown=function(box,x,y)

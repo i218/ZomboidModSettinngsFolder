@@ -69,6 +69,39 @@ small.tabs.activeIndex=1
 
 compact.tree.selected=1;compact.tree:onJoypadDown(Joypad.AButton,joy);assert(joy.focus==compact.page)
 compact.page:onJoypadDown(Joypad.BButton,joy);assert(joy.focus==compact.tree and compact.nav:getIsVisible())
+-- Search crosses collapsed folders, preserves layout/edits, and treats patterns literally.
+local searchOwner=newOptions(1280);local keyCalls=0
+local oldPress=function() keyCalls=keyCalls+1 end
+local oldConsumed=function() return false end
+searchOwner.onKeyPress=oldPress;searchOwner.isKeyConsumed=oldConsumed
+searchOwner:addModOptionsPanel();local searching=searchOwner.msfController
+local sf=assert(F.Model.create(searching.state,'Hidden'))
+F.Model.move(searching.state,'alpha',sf);F.Model.find(searching.state,sf).collapsed=true
+local alpha=searching.capture.groups[1];local oldName=alpha.name;alpha.name=searchName
+local function search(value)
+    searching.search:setText(value);searching.search.onTextChangeFunction(searching,searching.search)
+end
+search('');local originalRows=#searching.tree.items
+search(searchNeedle);assert(#searching.tree.items==3 and searching.tree.items[3].item.id=='alpha')
+assert(F.Model.find(searching.state,sf).collapsed,'search persisted folder expansion')
+search('[SPECIAL]');assert(#searching.tree.items==3,'literal/case-insensitive search failed')
+search('BETA');assert(#searching.tree.items==3 and searching.tree.items[3].item.id=='beta')
+search('missing query');assert(#searching.tree.items==1,'nonmatches were not removed')
+search('hidden');assert(#searching.tree.items==3,'folder-name search failed')
+search('');assert(F.Model.find(searching.state,sf).collapsed and #searching.tree.items==originalRows,'clearing search lost collapse state')
+alpha.name=oldName
+testCtrl=true
+assert(searchOwner:isKeyConsumed(Keyboard.KEY_F));searchOwner:onKeyPress(Keyboard.KEY_F)
+assert(searching.search.focused and keyCalls==0)
+testCtrl=false;searchOwner:onKeyPress(Keyboard.KEY_F);assert(keyCalls==1 and not searchOwner:isKeyConsumed(Keyboard.KEY_F))
+testCtrl=true;searching.host:setVisible(false);searching.search:unfocus()
+searchOwner:onKeyPress(Keyboard.KEY_F);assert(not searching.search.focused and keyCalls==2)
+searching.host:setVisible(true);F.UI.detach(searchOwner)
+assert(searchOwner.onKeyPress==oldPress and searchOwner.isKeyConsumed==oldConsumed and not searchOwner.wantKeyEvents)
+compact.navVisible=false;compact:layout();small:onKeyPress(Keyboard.KEY_F)
+assert(compact.navVisible and compact.search.focused,'Ctrl+F did not reveal compact navigation')
+testCtrl=false
+print('PASS search: Unicode case folding, literal matching, all folders, collapsed state, clear, keyboard focus/visibility, compact navigation and handler restoration')
 -- Explicit detach restores form ownership, positions and visibility wrappers.
 local group=compact.capture.groups[2];local oldY=group.nodes[1].y
 F.UI.detach(small);assert(not small.msfController and small.tabs.viewList[1].view==compact.page)

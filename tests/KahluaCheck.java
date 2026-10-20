@@ -4,6 +4,8 @@ public final class KahluaCheck {
  public static void main(String[] files)throws Exception {
   var p=new se.krka.kahlua.j2se.J2SEPlatform();var globals=p.newTable();globals.rawset("_G",globals);
   globals.rawset("unicodeName", "\u0418\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441");
+  globals.rawset("searchName", "\u0418\u043d\u0422\u0435\u0420\u0444\u0415\u0439\u0421 [Special]");
+  globals.rawset("searchNeedle", "\u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441");
   se.krka.kahlua.stdlib.BaseLib.register(globals);
   se.krka.kahlua.stdlib.BaseLib.setPrintCallback(System.out::println);
   se.krka.kahlua.stdlib.StringLib.register(p,globals);se.krka.kahlua.stdlib.TableLib.register(p,globals);
