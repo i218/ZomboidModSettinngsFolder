@@ -110,6 +110,18 @@ assert(group.nodes[1].ui:getY()==oldY and group.nodes[1].ui:getIsVisible())
 testFontSize=2
 local largeFont=newOptions(1100);largeFont:addModOptionsPanel();assert(largeFont.msfController.compact)
 testFontSize=nil
+-- Display-only fallback must preserve registry identity and native controls.
+local oldInfo=getModInfoByID
+getModInfoByID=function(id) if id=='unnamed.source' then return {getName=function() return 'Source Mod Title' end} end end
+local unnamed=PZAPI.ModOptions:create('unnamed.source');unnamed:addTickBox('enabled','Enabled',true)
+local namedOwner=newOptions(1280);namedOwner:addModOptionsPanel()
+local last=namedOwner.msfController.capture.groups[#namedOwner.msfController.capture.groups]
+assert(last.id=='unnamed.source' and last.name=='Source Mod Title' and unnamed.name=='unnamed.source')
+local headingFound=false
+for _,node in ipairs(last.nodes) do if node.ui.text=='Source Mod Title' then headingFound=true end end
+assert(headingFound,'native heading did not use source mod title')
+F.UI.detach(namedOwner);table.remove(PZAPI.ModOptions.Data);PZAPI.ModOptions.Dict['unnamed.source']=nil
+getModInfoByID=oldInfo
 -- Ambiguous IDs retain a usable native page and don't add the navigator.
 PZAPI.ModOptions:create('beta','Duplicate ID')
 local duplicate=newOptions(1280);duplicate:addModOptionsPanel();assert(not duplicate.msfController and duplicate.mainPanel:getWidth()==1280)

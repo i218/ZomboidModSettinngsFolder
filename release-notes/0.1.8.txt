@@ -1,0 +1,5 @@
+[h1]v0.1.8[/h1]
+[list]
+[*]Import now skips folders that have no matching settings sections. Existing local folders are preserved.
+[*]Settings sections without a proper title now show their source mod name in the folder list and settings heading.
+[/list]

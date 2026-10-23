@@ -1,4 +1,5 @@
 require "MSF/Model"
+require "MSF/Names"
 ModSettingsFolders.Capture={}
 local C=ModSettingsFolders.Capture
 -- This game's rawget() also traverses metatables. pairs() identifies own fields.
@@ -57,9 +58,9 @@ function C.build(owner,builder,width)
         finish()
         local options=definitions[#groups+1]
         if not options or text~=getText(options.name) then reject("section header mismatch at "..(#groups+1)) end
-        current={id=options and options.modOptionsID or "",name=text,nodes={},top=self.addY+y,bottom=self.addY+y}
+        current={id=options and options.modOptionsID or "",name=ModSettingsFolders.Names.display(options and options.modOptionsID or "",text),rawName=text,nodes={},top=self.addY+y,bottom=self.addY+y}
         groups[#groups+1]=current
-        return header(self,y,text)
+        return header(self,y,current.name)
     end
     local ok,result=pcall(builder,owner)
     owner.width=originalWidth;owner.getWidth=rawWidth;owner.addHorizontalLine=rawHeader;owner.addPage=rawPage

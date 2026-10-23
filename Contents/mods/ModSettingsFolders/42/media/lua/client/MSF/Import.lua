@@ -128,10 +128,14 @@ function I.merge(state,source,groups)
         else skipped=skipped+1 end
     end
     local candidate=M.new();candidate.nextId=state.nextId;candidate.unfiledCollapsed=state.unfiledCollapsed
-    local targets={};local created=0;local merged=0
+    local occupied={};for _,n in pairs(sections) do occupied[root(n)]=true end
+    local existing={};for n,item in ipairs(nodes) do if item.existing then existing[root(n)]=true end end
+    local targets={};local created=0;local merged=0;local skippedFolders=0
     for n,item in ipairs(nodes) do
         local component=root(n)
-        if not targets[component] then
+        if not existing[component] and not occupied[component] then
+            skippedFolders=skippedFolders+1
+        elseif not targets[component] then
             local f=item.folder;local id
             if item.existing then
                 id=f.id;candidate.folders[#candidate.folders+1]={id=id,name=f.name,collapsed=f.collapsed}
@@ -148,6 +152,6 @@ function I.merge(state,source,groups)
         if imported[key] then assigned=assigned+1 end
     end
     if not M.decode(M.encode(candidate)) then return nil,"limit" end
-    return candidate,{created=created,merged=merged,assigned=assigned,skipped=skipped}
+    return candidate,{created=created,merged=merged,assigned=assigned,skipped=skipped,skippedFolders=skippedFolders}
 end
 return I

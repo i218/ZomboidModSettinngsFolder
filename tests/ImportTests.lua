@@ -39,13 +39,23 @@ assert(#candidate.folders==3 and candidate.members.alpha==first and candidate.me
 assert(candidate.members.beta==other and M.find(candidate,other).name=='Local','existing folder identity lost')
 assert(report.assigned==3 and report.skipped==1 and report.created==1)
 local again=assert(I.merge(candidate,source,groups));assert(M.encode(again)==M.encode(candidate),'repeated import not idempotent')
+-- Source folders without matched settings are dropped; manual local empties stay.
+local empties=assert(I.decode('folder=1|1|Empty\nfolder=2|1|NoSettings\nmember=unknown|2\n'))
+local oldEmpty=M.new();local manual=assert(M.create(oldEmpty,'Manual empty'))
+local filtered,emptyReport=I.merge(oldEmpty,empties,groups)
+assert(#filtered.folders==1 and filtered.folders[1].id==manual and emptyReport.created==0 and emptyReport.skippedFolders==2)
+local mixed=assert(I.decode('folder=1|1|Keep\nfolder=2|1|Drop\nmember=alpha|1\nmember=unknown|2\n'))
+local filteredMixed=assert(I.merge(M.new(),mixed,groups))
+assert(#filteredMixed.folders==1 and filteredMixed.folders[1].name=='Keep' and filteredMixed.members.alpha)
+assert(M.encode(assert(I.merge(filteredMixed,mixed,groups)))==M.encode(filteredMixed))
 -- Overlap joins whole components, preserving both folders contents and oldest local name.
 local overlap=assert(I.decode('folder=1|1|Visual\nmember=alpha|1\nmember=beta|1\n'))
 M.move(state,'alpha',first);M.move(state,'otherDisabled',other)
 local joined=assert(I.merge(state,overlap,groups))
 assert(#joined.folders==1 and joined.members.alpha==first and joined.members.beta==first and joined.members.otherDisabled==first)
 local full=M.new();for n=1,99 do assert(M.create(full,'Folder'..n)) end
-assert(not I.merge(full,assert(I.decode('folder=1|1|Extra\n')),{}),'folder capacity exceeded')
+assert(#assert(I.merge(full,assert(I.decode('folder=1|1|Extra\n')),{})).folders==99,'empty folder consumed capacity')
+assert(not I.merge(full,assert(I.decode('folder=1|1|Extra\nmember=new|1\n')),{{id='new',name='New'}}),'folder capacity exceeded')
 local fullSections=M.new();local only=M.create(fullSections,'Existing')
 for n=1,2000 do M.move(fullSections,'old'..n,only) end
 assert(not I.merge(fullSections,assert(I.decode('folder=1|1|Existing\nmember=new|1\n')),{{id='new',name='New'}}),'membership capacity exceeded')

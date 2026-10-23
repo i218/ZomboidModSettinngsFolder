@@ -1,4 +1,4 @@
-# Verification — 0.1.7
+# Verification — 0.1.8
 
 Date: 2026-10-19. Independent mod; installed game files and user configuration were not changed. No live game was launched for these checks.
 
@@ -97,3 +97,20 @@ reader. ImportTests covers v1/v2 Unicode, folder merging and overlap chains,
 unmatched/ambiguous titles, idempotence, folder/member bounds, installed-only UI,
 source-file immutability, missing/corrupt data and failed-write rollback. Existing
 search, native-menu and separate-tab suites still run. Tests do not launch the game.
+
+
+## Empty imported folders and section display titles (0.1.8)
+
+Import filters empty source components after settings matching and overlap merging,
+before allocating local folder IDs. Existing local folders remain, including empty
+manual ones. Tests cover no matched settings, mixed empty/nonempty imports,
+idempotence and capacity: skipped empty folders do not consume the 99-folder limit.
+
+Names.lua retains meaningful explicit section titles. Missing, whitespace-only,
+ID-equivalent and unresolved UI localization titles use source mod metadata; unique
+normalized active-mod IDs are supported, while ambiguous/unavailable metadata keeps
+the stable section ID. Capture validates the original native header before applying
+the display-only title, preserving original registry IDs, option data and controls.
+NamesTests and native-form integration check metadata failures, Unicode, explicit
+titles, ambiguous IDs and both sidebar/form header names. These are automated
+Kahlua checks using UI primitives as doubles, not live game UI acceptance.
