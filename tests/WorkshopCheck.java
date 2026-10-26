@@ -12,7 +12,7 @@ public final class WorkshopCheck {
         zombie.ZomboidFileSystem.instance.setCacheDir(folder.getParent().toString());
         var item=new SteamWorkshopItem(folder.toString());
         if(!item.readWorkshopTxt()) throw new AssertionError("Native metadata reader rejected workshop.txt");
-        if(!"private".equals(item.getVisibility())) throw new AssertionError("Expected private initial visibility");
+        if(!"public".equals(item.getVisibility())) throw new AssertionError("Expected public initial visibility");
         var allowed=Files.readAllLines(Path.of("media/WorkshopTags.txt"));
         if(!allowed.containsAll(item.getTags())) throw new AssertionError("Unknown Workshop tags");
         String result=item.validateContents();

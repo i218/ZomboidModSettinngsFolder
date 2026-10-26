@@ -30,7 +30,7 @@ $metadata = Get-Content -LiteralPath (Join-Path $folder 'workshop.txt') -Encodin
 foreach ($key in @('version','title','tags','visibility')) {
     if (@($metadata | Where-Object { $_.StartsWith("$key=") }).Count -ne 1) { throw "Missing/duplicate workshop field: $key" }
 }
-if ('version=1' -notin $metadata -or 'visibility=private' -notin $metadata) { throw 'Expected version=1 and private initial visibility' }
+if ('version=1' -notin $metadata -or 'visibility=public' -notin $metadata) { throw 'Expected version=1 and public initial visibility' }
 $ids = @($metadata | Where-Object { $_.StartsWith('id=') })
 [UInt64]$parsedId = 0
 if ($ids.Count -gt 1 -or ($ids.Count -eq 1 -and (!(($ids[0].Substring(3)) -match '^[1-9][0-9]{0,19}$') -or ![UInt64]::TryParse($ids[0].Substring(3),[ref]$parsedId)))) { throw 'Invalid or duplicate Workshop ID' }
@@ -41,4 +41,4 @@ if ($png.Length -gt 1024000 -or [BitConverter]::ToString($png[0..7]) -ne '89-50-
 $width = [BitConverter]::ToUInt32([byte[]]($png[19..16]),0)
 $height = [BitConverter]::ToUInt32([byte[]]($png[23..20]),0)
 if ($width -ne 512 -or $height -ne 512) { throw 'Expected square 512px cover' }
-Write-Output "PASS clean Workshop inventory ($($files.Count) files), source hashes, metadata, private visibility, ID and preview ($width x $height)"
+Write-Output "PASS clean Workshop inventory ($($files.Count) files), source hashes, metadata, public visibility, ID and preview ($width x $height)"

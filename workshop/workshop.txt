@@ -28,4 +28,4 @@ description=
 description=[h2]Кратко по-русски[/h2]
 description=Сворачиваемые папки разделов в Настройки > Моды. Создайте папку и перенесите раздел через ПКМ. Включите мод и перезапустите игру. Требуется Build 42;
 tags=Build 42;Interface;QoL
-visibility=private
+visibility=public

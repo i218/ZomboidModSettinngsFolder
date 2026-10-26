@@ -13,6 +13,10 @@
   `build/distributions/<version>/CHANGELOG-Steam.txt`, beside the release artifacts.
   Include the changelog in the delivery response. Never copy it into Workshop
   upload folders, runtime files or installer payloads.
+- Do not build installers for future releases. Prepare the Workshop package and
+  synchronize it locally for delivery; Steam upload stays manual.
+- New Workshop packages default to public visibility. Existing publication metadata
+  remains preserved unless the user explicitly requests a change.
 - At each push, also synchronize this mod's local Zomboid Workshop authoring folder
   using `Sync-Workshop.ps1`, after verifying the prepared package. Check the real
   folder first; it may contain the user's live publication metadata.
