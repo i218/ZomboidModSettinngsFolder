@@ -15,24 +15,25 @@ function N.missing(id,text)
         text:match("^IGUI_")~=nil or text:match("^Sandbox_")~=nil or
         string.lower(text)=="options" or string.lower(text)=="settings"
 end
+function N.source(id)
+    local title=info(id)
+    if title then return title,id end
+    if getActivatedMods then
+        local ok,found,source=pcall(function()
+            local active=getActivatedMods();local result,modId;local count=0
+            for n=0,active:size()-1 do
+                local candidate=active:get(n)
+                if key(candidate)==key(id) then count=count+1;modId=candidate;result=info(candidate) end
+            end
+            if count==1 then return result,modId end
+        end)
+        if ok then return found,source end
+    end
+end
 function N.display(id,text)
     text=clean(text)
     if not N.missing(id,text) then return text end
-    local title=info(id)
-    if title then return title end
-    -- Some registries format the source ID differently (spaces, hyphens, case).
-    -- Resolve only unique active-mod ID matches; never guess by substring.
-    if getActivatedMods then
-        local ok,found=pcall(function()
-            local active=getActivatedMods();local result;local count=0
-            for n=0,active:size()-1 do
-                local modId=active:get(n)
-                if key(modId)==key(id) then count=count+1;result=info(modId) end
-            end
-            return count==1 and result or nil
-        end)
-        if ok and found then return found end
-    end
-    return clean(id)~="" and id or text
+    local title=N.source(id)
+    return title or (clean(id)~="" and id or text)
 end
 return N

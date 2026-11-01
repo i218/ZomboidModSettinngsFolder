@@ -1,4 +1,4 @@
-# Verification — 0.1.8
+# Verification — 0.1.9
 
 Date: 2026-10-19. Independent mod; installed game files and user configuration were not changed. No live game was launched for these checks.
 
@@ -114,3 +114,16 @@ the display-only title, preserving original registry IDs, option data and contro
 NamesTests and native-form integration check metadata failures, Unicode, explicit
 titles, ambiguous IDs and both sidebar/form header names. These are automated
 Kahlua checks using UI primitives as doubles, not live game UI acceptance.
+
+
+## Expanded search (0.1.9)
+
+Capture retains read-only references to native options plus resolved source mod
+name/ID. Search checks localized option names and individual multiple-checkbox
+labels in addition to existing section/folder names and IDs. Option values are
+not searched or modified. Whitespace/underscore runs normalize to a single space;
+matching remains Unicode case-insensitive and literal. Group matches are computed
+once per refresh, not repeated for every folder. Tests cover setting labels,
+Unicode labels, sub-checkboxes, distinct mod names, spaced/underscore IDs and
+preservation of pending edits and persisted layout. Metadata resolution still
+rejects ambiguous source IDs. No installer is produced for this release.

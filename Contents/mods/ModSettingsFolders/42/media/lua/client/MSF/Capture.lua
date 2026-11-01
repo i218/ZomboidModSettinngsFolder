@@ -59,6 +59,8 @@ function C.build(owner,builder,width)
         local options=definitions[#groups+1]
         if not options or text~=getText(options.name) then reject("section header mismatch at "..(#groups+1)) end
         current={id=options and options.modOptionsID or "",name=ModSettingsFolders.Names.display(options and options.modOptionsID or "",text),rawName=text,nodes={},top=self.addY+y,bottom=self.addY+y}
+        current.options=options
+        current.modName,current.modId=ModSettingsFolders.Names.source(current.id)
         groups[#groups+1]=current
         return header(self,y,current.name)
     end

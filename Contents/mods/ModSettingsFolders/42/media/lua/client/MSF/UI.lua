@@ -12,6 +12,9 @@ require "ISUI/ISModalDialog"
 local U={};ModSettingsFolders.UI=U
 local M,S,C=ModSettingsFolders.Model,ModSettingsFolders.Store,ModSettingsFolders.Capture
 local function focus(ui,data) if data then data.focus=ui;updateJoypadFocus(data) end end
+local function searchText(text)
+    return type(text)=="string" and string.lower(text):gsub("[_%s]+"," "):gsub("^%s+",""):gsub("%s+$","") or ""
+end
 local function height() return math.max(26,getTextManager():getFontHeight(UIFont.Small)+10) end
 function U.message(key,...)
     local screen=getCore()
@@ -89,7 +92,20 @@ end
 function U:refresh()
     local list=self.tree;local scroll=list:getYScroll();list:clear()
     local query=self.query or ""
-    local function matches(text) return string.find(string.lower(text),query,1,true)~=nil end
+    local function matches(text) return type(text)=="string" and string.find(searchText(text),query,1,true)~=nil end
+    local function groupMatches(group)
+        if query=="" or matches(group.name) or matches(group.rawName) or matches(group.id) or matches(group.modName) or matches(group.modId) then return true end
+        for _,option in ipairs(group.options and group.options.data or {}) do
+            if type(option.name)=="string" and matches(getText(option.name)) then return true end
+            if option.type=="multipletickbox" then
+                for _,entry in ipairs(option.values or {}) do
+                    if type(entry.name)=="string" and matches(getText(entry.name)) then return true end
+                end
+            end
+        end
+        return false
+    end
+    local matched={};for _,group in ipairs(self.capture.groups) do matched[group.id]=groupMatches(group) end
     local preferred,fallback
     local function add(text,row)
         local item=list:addItem(text,row)
@@ -105,7 +121,7 @@ function U:refresh()
         for _,group in ipairs(groups) do
             local assigned=self.state.members[group.id]
             if ((id=="unfiled" and not assigned) or assigned==id) and
-                (query=="" or matches(label) or matches(group.name) or matches(group.id)) then entries[#entries+1]=group end
+                (matched[group.id] or matches(label)) then entries[#entries+1]=group end
         end
         if query~="" and #entries==0 then return end
         closed=closed and query==""
@@ -185,7 +201,7 @@ function U.attach(owner,capture,navWidth,compact)
     nav:addChild(search);self.search=search
     search.target=self
     search.onTextChangeFunction=function(controller,entry)
-        controller.query=string.lower(entry:getText():gsub("^%s+",""):gsub("%s+$",""))
+        controller.query=searchText(entry:getText())
         controller.tree:setYScroll(0);controller:refresh()
     end
     local function shortcut(key)

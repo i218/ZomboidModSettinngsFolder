@@ -87,6 +87,22 @@ assert(F.Model.find(searching.state,sf).collapsed,'search persisted folder expan
 search('[SPECIAL]');assert(#searching.tree.items==3,'literal/case-insensitive search failed')
 search('BETA');assert(#searching.tree.items==3 and searching.tree.items[3].item.id=='beta')
 search('missing query');assert(#searching.tree.items==1,'nonmatches were not removed')
+local beforeSearchFile=files[F.Store.file];local beforeSearchValue=text.value
+search('tick');assert(#searching.tree.items==3 and searching.tree.items[3].item.id=='alpha','setting name not searchable')
+local oldSettingName=tick.name;local searchSectionName=alpha.name
+alpha.name='Different section';tick.name=searchName
+search(searchNeedle);assert(#searching.tree.items==3,'Unicode setting name not searchable')
+tick.name=oldSettingName;alpha.name=searchSectionName
+search('unsaved');assert(#searching.tree.items==1,'setting value was searched instead of its label')
+
+search('SECOND');assert(#searching.tree.items==3 and searching.tree.items[3].item.id=='alpha','multiple checkbox label not searchable')
+alpha.modName='Descriptive Source Mod';alpha.modId='some_mod_id'
+search('source mod');assert(#searching.tree.items==3,'source mod name not searchable')
+search('SoMe   Mod ID');assert(#searching.tree.items==3,'spaced mod ID did not match underscores')
+search('some_mod_id');assert(#searching.tree.items==3,'exact underscore ID failed')
+alpha.modName=nil;alpha.modId=nil
+assert(files[F.Store.file]==beforeSearchFile and text.value==beforeSearchValue,'search modified saved layout or pending value')
+
 search('hidden');assert(#searching.tree.items==3,'folder-name search failed')
 search('');assert(F.Model.find(searching.state,sf).collapsed and #searching.tree.items==originalRows,'clearing search lost collapse state')
 alpha.name=oldName
@@ -116,7 +132,7 @@ getModInfoByID=function(id) if id=='unnamed.source' then return {getName=functio
 local unnamed=PZAPI.ModOptions:create('unnamed.source');unnamed:addTickBox('enabled','Enabled',true)
 local namedOwner=newOptions(1280);namedOwner:addModOptionsPanel()
 local last=namedOwner.msfController.capture.groups[#namedOwner.msfController.capture.groups]
-assert(last.id=='unnamed.source' and last.name=='Source Mod Title' and unnamed.name=='unnamed.source')
+assert(last.id=='unnamed.source' and last.name=='Source Mod Title' and last.modName=='Source Mod Title' and last.modId=='unnamed.source' and last.options==unnamed and unnamed.name=='unnamed.source')
 local headingFound=false
 for _,node in ipairs(last.nodes) do if node.ui.text=='Source Mod Title' then headingFound=true end end
 assert(headingFound,'native heading did not use source mod title')

@@ -1,0 +1,7 @@
+[h1]v0.1.9[/h1]
+[list]
+[*]Search now includes individual setting names and source mod names. Spaces also match underscores in mod IDs, so some mod finds some_mod.
+[*]Imported folders without matching settings sections are skipped; existing local folders are preserved.
+[*]Sections without a proper title show their source mod name.
+[*]Workshop packages default to public visibility.
+[/list]
